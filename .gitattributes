@@ -1,0 +1,11 @@
+[attr]rust text eol=lf whitespace=tab-in-indent,trailing-space,tabwidth=4
+
+Cargo.lock text
+Cargo.toml text
+LICENSE text
+
+*.md text
+*.rs rust diff=rust
+*.yml text
+
+*.png binary
