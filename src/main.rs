@@ -117,9 +117,8 @@ impl eframe::App for MyApp {
                     for j in 0..columns {
                         let k = columns * i + j;
                         ui.vertical(|ui| {
-                            let name_label = ui.label("Name: ");
-                            ui.text_edit_singleline(&mut self.soldiers[k].name)
-                                .labelled_by(name_label.id);
+                            ui.label("Name: ");
+                            ui.text_edit_singleline(&mut self.soldiers[k].name);
                             ui.add(
                                 egui::Slider::new(&mut self.soldiers[k].tus, 35..=70).text("TUS"),
                             );
