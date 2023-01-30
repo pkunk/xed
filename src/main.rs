@@ -56,6 +56,7 @@ fn main() {
                 save_name,
                 orig_save_data: save_data,
                 soldiers,
+                backup: true,
             })
         }),
     )
@@ -90,6 +91,7 @@ struct MyApp {
     save_name: OsString,
     orig_save_data: Vec<u8>,
     soldiers: [Soldier; N],
+    backup: bool,
 }
 
 impl eframe::App for MyApp {
@@ -104,8 +106,11 @@ impl eframe::App for MyApp {
                     write_save_file(
                         &self.save_name,
                         &write_save_data(&self.orig_save_data, &self.soldiers),
+                        self.backup,
                     );
                 }
+                ui.label("    ");
+                ui.checkbox(&mut self.backup, "Enable backup");
                 ui.label("    ");
                 ui.label(self.save_name.to_string_lossy());
             });
@@ -140,7 +145,7 @@ impl eframe::App for MyApp {
                             );
                             ui.label("");
                             let sum = self.soldiers[k].sum();
-                            let sum_text = format!("SUM: {}", sum);
+                            let sum_text = format!("SUM: {sum}");
                             match sum.cmp(&STAT_SUM) {
                                 Ordering::Greater => ui.label(sum_text),
                                 Ordering::Less => ui.weak(sum_text),
@@ -305,10 +310,9 @@ fn write_save_data(orig_data: &[u8], soldiers: &[Soldier]) -> Vec<u8> {
     result
 }
 
-fn write_save_file(save_name: &OsStr, save_data: &[u8]) {
+fn write_save_file(save_name: &OsStr, save_data: &[u8], backup: bool) {
     let path = Path::new(save_name);
-    if !path.exists() {
-        eprintln!("Original save file not found.");
+    if !backup || !path.exists() {
         if fs::write(path, save_data).is_err() {
             eprintln!("Failed to write a save file.");
         }
@@ -321,7 +325,7 @@ fn write_save_file(save_name: &OsStr, save_data: &[u8]) {
     if backup_path.exists() {
         let mut found = false;
         for i in 0..256 {
-            backup_path.set_extension(format!("bak{}", i));
+            backup_path.set_extension(format!("bak{i}"));
             if !backup_path.exists() {
                 found = true;
                 break;
