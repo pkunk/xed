@@ -45,10 +45,10 @@ fn main() {
     let soldiers: [Soldier; N] = soldiers.try_into().unwrap();
 
     let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(1200.0, 760.0)),
+        initial_window_size: Some(egui::vec2(680.0, 400.0)),
         ..Default::default()
     };
-    eframe::run_native(
+    let gui = eframe::run_native(
         "Xenonauts save editor",
         options,
         Box::new(|_cc| {
@@ -59,7 +59,10 @@ fn main() {
                 backup: true,
             })
         }),
-    )
+    );
+    if gui.is_err() {
+        eprintln!("Failed to run GUI.");
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -115,43 +118,52 @@ impl eframe::App for MyApp {
                 ui.label(self.save_name.to_string_lossy());
             });
 
-            let columns = 4;
-            for i in 0..(N / columns) {
-                ui.label("");
+            ui.label("");
+
+            ui.horizontal(|ui| {
+                ui.label("                                                                                                   ");
+                ui.label("TUS      ");
+                ui.label("HPS      ");
+                ui.label("STR      ");
+                ui.label("ACC      ");
+                ui.label("RFL      ");
+                ui.label("BRV      ");
+            });
+
+            for i in 0..N {
                 ui.horizontal(|ui| {
-                    for j in 0..columns {
-                        let k = columns * i + j;
-                        ui.vertical(|ui| {
-                            let name_label = ui.label("Name: ");
-                            ui.text_edit_singleline(&mut self.soldiers[k].name)
-                                .labelled_by(name_label.id);
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].tus, 35..=70).text("TUS"),
-                            );
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].hps, 35..=70).text("HPS"),
-                            );
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].str, 35..=70).text("STR"),
-                            );
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].acc, 35..=70).text("ACC"),
-                            );
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].rfl, 35..=70).text("RFL"),
-                            );
-                            ui.add(
-                                egui::Slider::new(&mut self.soldiers[k].brv, 35..=70).text("BRV"),
-                            );
-                            ui.label("");
-                            let sum = self.soldiers[k].sum();
-                            let sum_text = format!("SUM: {sum}");
-                            match sum.cmp(&STAT_SUM) {
-                                Ordering::Greater => ui.label(sum_text),
-                                Ordering::Less => ui.weak(sum_text),
-                                Ordering::Equal => ui.strong(sum_text),
-                            }
-                        });
+                    ui.text_edit_singleline(&mut self.soldiers[i].name);
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].tus)
+                            .clamp_range(35..=70)
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].hps)
+                            .clamp_range(35..=70),
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].str)
+                            .clamp_range(35..=70),
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].acc)
+                            .clamp_range(35..=70),
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].rfl)
+                            .clamp_range(35..=70),
+                    );
+                    ui.add(
+                        egui::DragValue::new(&mut self.soldiers[i].brv)
+                            .clamp_range(35..=70),
+                    );
+                    ui.label("");
+                    let sum = self.soldiers[i].sum();
+                    let sum_text = format!("SUM: {sum}");
+                    match sum.cmp(&STAT_SUM) {
+                        Ordering::Greater => ui.label(sum_text),
+                        Ordering::Less => ui.weak(sum_text),
+                        Ordering::Equal => ui.strong(sum_text),
                     }
                 });
             }
