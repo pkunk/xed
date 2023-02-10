@@ -33,5 +33,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
+          curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.2
           bin/hub release edit -a "dist/xed-windows.zip" -m ${GITHUB_REF#refs/tags/} ${GITHUB_REF#refs/tags/}
