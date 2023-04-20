@@ -210,11 +210,11 @@ impl TextBuffer for NameString {
 fn parse_save(save_data: &[u8]) -> Vec<Soldier> {
     let mut soldiers = vec![];
 
-    let ac = AhoCorasick::new([MARK]);
-    let ac2 = AhoCorasick::new([MARK2]);
+    let ac = AhoCorasick::new([MARK]).unwrap();
+    let ac2 = AhoCorasick::new([MARK2]).unwrap();
 
     let mut matches = vec![];
-    for mat in ac.find_iter(&save_data) {
+    for mat in ac.find_iter(save_data) {
         let start = mat.end() + 1;
         let end = ac2.find_iter(&save_data[start..]).next().unwrap().start() + start;
         matches.push((start, end));

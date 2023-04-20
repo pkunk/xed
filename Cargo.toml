@@ -11,5 +11,5 @@ lto = true
 strip = true
 
 [dependencies]
-aho-corasick = "0.7"
+aho-corasick = "1.0"
 eframe = "0.21"
