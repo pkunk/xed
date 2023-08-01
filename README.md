@@ -1,4 +1,4 @@
-# Xenonauts save editor
+# Xenonauts CE save editor
 
 ### Screenshot:
 ![Screenshot](xed.png)

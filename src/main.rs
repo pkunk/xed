@@ -42,7 +42,7 @@ fn main() {
         ..Default::default()
     };
     let gui = eframe::run_native(
-        "Xenonauts save editor",
+        "Xenonauts CE save editor",
         options,
         Box::new(|_cc| {
             Box::new(MyApp {
@@ -116,18 +116,7 @@ impl eframe::App for MyApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.label("");
             ui.horizontal(|ui| {
-                ui.label("    ");
-                ui.heading("Xenonauts save editor");
                 ui.label("        ");
-                if ui.button("Save").clicked() {
-                    if let Some(save_name) = &self.save_name {
-                        write_save_file(
-                            save_name,
-                            &write_save_data(self.orig_save_data.as_ref().unwrap(), &self.soldiers),
-                            self.backup,
-                        );
-                    }
-                }
                 if ui.button("Open").clicked() {
                     let mut dialog = FileDialog::open_file(None);
                     dialog.open();
@@ -153,6 +142,15 @@ impl eframe::App for MyApp {
                             self.orig_save_data = Some(save_data);
                             self.soldiers = soldiers;
                         }
+                    }
+                }
+                if ui.button("Save").clicked() {
+                    if let Some(save_name) = &self.save_name {
+                        write_save_file(
+                            save_name,
+                            &write_save_data(self.orig_save_data.as_ref().unwrap(), &self.soldiers),
+                            self.backup,
+                        );
                     }
                 }
                 ui.label("    ");
