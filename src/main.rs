@@ -11,8 +11,11 @@ use std::ops::Range;
 use std::path::{Path, PathBuf};
 
 const N: usize = 12;
-const STAT_SUM: u32 = 320;
 const MAX_NAME_LEN: usize = 20;
+
+const STAT_SUM: u32 = 320;
+const MIN_STAT: u32 = 35;
+const MAX_STAT: u32 = 70;
 
 // MARK....Soldier
 static MARK: &[u8] = &[
@@ -81,12 +84,12 @@ impl Default for Soldier {
             name: NameString {
                 text: "None".to_owned(),
             },
-            tus: MIN_STAT as u32,
-            hps: MIN_STAT as u32,
-            str: MIN_STAT as u32,
-            acc: MIN_STAT as u32,
-            rfl: MIN_STAT as u32,
-            brv: MIN_STAT as u32,
+            tus: MIN_STAT,
+            hps: MIN_STAT,
+            str: MIN_STAT,
+            acc: MIN_STAT,
+            rfl: MIN_STAT,
+            brv: MIN_STAT,
             orig_name_offset: 0,
             orig_name_len: 0,
             orig_stats_offset: 0,
@@ -107,9 +110,6 @@ struct MyApp {
     backup: bool,
     open_file_dialog: Option<FileDialog>,
 }
-
-const MIN_STAT: i32 = 35;
-const MAX_STAT: i32 = 70;
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
