@@ -3,11 +3,12 @@
 use aho_corasick::AhoCorasick;
 use eframe::egui;
 use eframe::egui::TextBuffer;
+use egui_file::FileDialog;
 use std::cmp::Ordering;
 use std::ffi::{OsStr, OsString};
+use std::fs;
 use std::ops::Range;
 use std::path::{Path, PathBuf};
-use std::{env, fs};
 
 const N: usize = 12;
 const STAT_SUM: u32 = 320;
@@ -27,21 +28,10 @@ static MARK2: &[u8] = &[
 static SEP: &[u8] = &[0x00, 0x00, 0x00];
 
 fn main() {
-    let mut args = env::args_os();
-    let save_name = if let Some(name) = args.nth(1) {
-        name
-    } else {
-        eprintln!("Please specify save file as parameter.");
-        return;
-    };
-    let save_data = if let Ok(data) = fs::read(Path::new(&save_name)) {
-        data
-    } else {
-        eprintln!("Failed to read the save file.");
-        return;
-    };
-
-    let soldiers = parse_save(&save_data);
+    let mut soldiers = Vec::new();
+    for _ in 0..N {
+        soldiers.push(Soldier::default());
+    }
     let soldiers: [Soldier; N] = soldiers.try_into().unwrap();
 
     let options = eframe::NativeOptions {
@@ -53,10 +43,11 @@ fn main() {
         options,
         Box::new(|_cc| {
             Box::new(MyApp {
-                save_name,
-                orig_save_data: save_data,
+                save_name: None,
+                orig_save_data: None,
                 soldiers,
                 backup: true,
+                open_file_dialog: None,
             })
         }),
     );
@@ -84,6 +75,25 @@ struct Soldier {
     orig_stats_offset: usize,
 }
 
+impl Default for Soldier {
+    fn default() -> Self {
+        Soldier {
+            name: NameString {
+                text: "None".to_owned(),
+            },
+            tus: MIN_STAT as u32,
+            hps: MIN_STAT as u32,
+            str: MIN_STAT as u32,
+            acc: MIN_STAT as u32,
+            rfl: MIN_STAT as u32,
+            brv: MIN_STAT as u32,
+            orig_name_offset: 0,
+            orig_name_len: 0,
+            orig_stats_offset: 0,
+        }
+    }
+}
+
 impl Soldier {
     fn sum(&self) -> u32 {
         self.tus + self.hps + self.str + self.acc + self.rfl + self.brv
@@ -91,11 +101,15 @@ impl Soldier {
 }
 
 struct MyApp {
-    save_name: OsString,
-    orig_save_data: Vec<u8>,
+    save_name: Option<OsString>,
+    orig_save_data: Option<Vec<u8>>,
     soldiers: [Soldier; N],
     backup: bool,
+    open_file_dialog: Option<FileDialog>,
 }
+
+const MIN_STAT: i32 = 35;
+const MAX_STAT: i32 = 70;
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -106,16 +120,47 @@ impl eframe::App for MyApp {
                 ui.heading("Xenonauts save editor");
                 ui.label("        ");
                 if ui.button("Save").clicked() {
-                    write_save_file(
-                        &self.save_name,
-                        &write_save_data(&self.orig_save_data, &self.soldiers),
-                        self.backup,
-                    );
+                    if let Some(save_name) = &self.save_name {
+                        write_save_file(
+                            save_name,
+                            &write_save_data(self.orig_save_data.as_ref().unwrap(), &self.soldiers),
+                            self.backup,
+                        );
+                    }
+                }
+                if ui.button("Open").clicked() {
+                    let mut dialog = FileDialog::open_file(None);
+                    dialog.open();
+                    self.open_file_dialog = Some(dialog);
+                }
+                if let Some(dialog) = &mut self.open_file_dialog {
+                    if dialog.show(ctx).selected() {
+                        if let Some(file) = dialog.path() {
+                            let save_name = file.try_into().unwrap();
+                            let save_data = if let Ok(data) = fs::read(Path::new(&save_name)) {
+                                data
+                            } else {
+                                eprintln!("Failed to read the save file.");
+                                return;
+                            };
+                            let soldiers = parse_save(&save_data);
+                            if soldiers.len() != N {
+                                eprintln!("Invalid save file.");
+                                return;
+                            }
+                            let soldiers: [Soldier; N] = soldiers.try_into().unwrap();
+                            self.save_name = Some(save_name);
+                            self.orig_save_data = Some(save_data);
+                            self.soldiers = soldiers;
+                        }
+                    }
                 }
                 ui.label("    ");
                 ui.checkbox(&mut self.backup, "Enable backup");
                 ui.label("    ");
-                ui.label(self.save_name.to_string_lossy());
+                if let Some(save_name) = &self.save_name {
+                    ui.label(save_name.to_string_lossy());
+                }
             });
 
             ui.label("");
@@ -135,27 +180,27 @@ impl eframe::App for MyApp {
                     ui.text_edit_singleline(&mut self.soldiers[i].name);
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].tus)
-                            .clamp_range(35..=70)
+                            .clamp_range(MIN_STAT..=MAX_STAT)
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].hps)
-                            .clamp_range(35..=70),
+                            .clamp_range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].str)
-                            .clamp_range(35..=70),
+                            .clamp_range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].acc)
-                            .clamp_range(35..=70),
+                            .clamp_range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].rfl)
-                            .clamp_range(35..=70),
+                            .clamp_range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].brv)
-                            .clamp_range(35..=70),
+                            .clamp_range(MIN_STAT..=MAX_STAT),
                     );
                     ui.label("");
                     let sum = self.soldiers[i].sum();
