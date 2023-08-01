@@ -27,7 +27,8 @@ jobs:
           cp target/x86_64-pc-windows-gnu/release/xed.exe dist/
           cp LICENSE dist/LICENSE.txt
           cd dist
-          zip -r xed-windows xed.exe LICENSE.txt
+          sha256sum xed.exe > CHECKSUM.sha256
+          zip -r xed-windows xed.exe LICENSE.txt CHECKSUM.sha256
           cd ..
       - name: Create Release
         env:
