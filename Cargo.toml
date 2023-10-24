@@ -12,5 +12,5 @@ strip = true
 
 [dependencies]
 aho-corasick = "1.0"
-eframe = "0.22"
-egui_file = "0.10"
+eframe = "0.23"
+egui_file = "0.11"
