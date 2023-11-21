@@ -14,8 +14,8 @@ const N: usize = 12;
 const MAX_NAME_LEN: usize = 20;
 
 const STAT_SUM: u32 = 320;
-const MIN_STAT: u32 = 35;
-const MAX_STAT: u32 = 70;
+const MIN_STAT: u8 = 35;
+const MAX_STAT: u8 = 70;
 
 // MARK....Soldier
 static MARK: &[u8] = &[
@@ -67,12 +67,12 @@ struct NameString {
 #[derive(Clone, Debug)]
 struct Soldier {
     name: NameString,
-    tus: u32,
-    hps: u32,
-    str: u32,
-    acc: u32,
-    rfl: u32,
-    brv: u32,
+    tus: u8,
+    hps: u8,
+    str: u8,
+    acc: u8,
+    rfl: u8,
+    brv: u8,
     orig_name_offset: usize,
     orig_name_len: usize,
     orig_stats_offset: usize,
@@ -99,7 +99,12 @@ impl Default for Soldier {
 
 impl Soldier {
     fn sum(&self) -> u32 {
-        self.tus + self.hps + self.str + self.acc + self.rfl + self.brv
+        u32::from(self.tus)
+            + u32::from(self.hps)
+            + u32::from(self.str)
+            + u32::from(self.acc)
+            + u32::from(self.rfl)
+            + u32::from(self.brv)
     }
 }
 
@@ -314,12 +319,12 @@ fn parse_save(save_data: &[u8]) -> Vec<Soldier> {
             name: NameString {
                 text: name.to_string(),
             },
-            tus: (*tus) as u32,
-            hps: (*hps) as u32,
-            str: (*str) as u32,
-            acc: (*acc) as u32,
-            rfl: (*rfl) as u32,
-            brv: (*brv) as u32,
+            tus: *tus,
+            hps: *hps,
+            str: *str,
+            acc: *acc,
+            rfl: *rfl,
+            brv: *brv,
             orig_name_offset,
             orig_name_len,
             orig_stats_offset,
@@ -338,17 +343,17 @@ fn write_save_data(orig_data: &[u8], soldiers: &[Soldier]) -> Vec<u8> {
         let mut cursor = s.orig_stats_offset;
 
         cursor += SEP.len() + 1;
-        result[cursor] = s.hps as u8;
+        result[cursor] = s.hps;
         cursor += SEP.len() + 1;
-        result[cursor] = s.str as u8;
+        result[cursor] = s.str;
         cursor += SEP.len() + 1;
-        result[cursor] = s.acc as u8;
+        result[cursor] = s.acc;
         cursor += SEP.len() + 1;
-        result[cursor] = s.rfl as u8;
+        result[cursor] = s.rfl;
         cursor += SEP.len() + 1;
-        result[cursor] = s.brv as u8;
+        result[cursor] = s.brv;
         cursor += SEP.len() + 1;
-        result[cursor] = s.tus as u8;
+        result[cursor] = s.tus;
 
         let offset = s.orig_name_offset + 1 + SEP.len();
         if s.name.text.len() == s.orig_name_len {
