@@ -38,7 +38,7 @@ fn main() {
     let soldiers: [Soldier; N] = soldiers.try_into().unwrap();
 
     let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(680.0, 400.0)),
+        viewport: egui::ViewportBuilder::default().with_inner_size([680.0, 400.0]),
         ..Default::default()
     };
     let gui = eframe::run_native(

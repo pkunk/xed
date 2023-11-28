@@ -11,6 +11,6 @@ lto = true
 strip = true
 
 [dependencies]
-aho-corasick = "1.0"
-eframe = "0.23"
-egui_file = "0.11"
+aho-corasick = "1.1"
+eframe = "0.24"
+egui_file = "0.12"
