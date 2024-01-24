@@ -130,7 +130,7 @@ impl eframe::App for MyApp {
                 if let Some(dialog) = &mut self.open_file_dialog {
                     if dialog.show(ctx).selected() {
                         if let Some(file) = dialog.path() {
-                            let save_name = file.try_into().unwrap();
+                            let save_name = file.into();
                             let save_data = if let Ok(data) = fs::read(Path::new(&save_name)) {
                                 data
                             } else {
@@ -244,7 +244,7 @@ impl TextBuffer for NameString {
         self.text.clear();
     }
 
-    fn replace(&mut self, text: &str) {
+    fn replace_with(&mut self, text: &str) {
         if text.is_ascii() && text.len() <= MAX_NAME_LEN {
             self.text = text.to_owned();
         }
