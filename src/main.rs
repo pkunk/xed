@@ -45,13 +45,13 @@ fn main() {
         "Xenonauts CE save editor",
         options,
         Box::new(|_cc| {
-            Box::new(MyApp {
+            Ok(Box::new(MyApp {
                 save_name: None,
                 orig_save_data: None,
                 soldiers,
                 backup: true,
                 open_file_dialog: None,
-            })
+            }))
         }),
     );
     if gui.is_err() {
@@ -183,27 +183,27 @@ impl eframe::App for MyApp {
                     ui.text_edit_singleline(&mut self.soldiers[i].name);
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].tus)
-                            .clamp_range(MIN_STAT..=MAX_STAT)
+                            .range(MIN_STAT..=MAX_STAT)
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].hps)
-                            .clamp_range(MIN_STAT..=MAX_STAT),
+                            .range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].str)
-                            .clamp_range(MIN_STAT..=MAX_STAT),
+                            .range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].acc)
-                            .clamp_range(MIN_STAT..=MAX_STAT),
+                            .range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].rfl)
-                            .clamp_range(MIN_STAT..=MAX_STAT),
+                            .range(MIN_STAT..=MAX_STAT),
                     );
                     ui.add(
                         egui::DragValue::new(&mut self.soldiers[i].brv)
-                            .clamp_range(MIN_STAT..=MAX_STAT),
+                            .range(MIN_STAT..=MAX_STAT),
                     );
                     ui.label("");
                     let sum = self.soldiers[i].sum();
@@ -246,7 +246,7 @@ impl TextBuffer for NameString {
 
     fn replace_with(&mut self, text: &str) {
         if text.is_ascii() && text.len() <= MAX_NAME_LEN {
-            self.text = text.to_owned();
+            text.clone_into(&mut self.text);
         }
     }
 
