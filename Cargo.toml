@@ -12,5 +12,5 @@ lto = true
 
 [dependencies]
 aho-corasick = "1.1"
-eframe = "0.29"
-egui_file = "0.19"
+eframe = "0.32"
+egui_file = "0.23"

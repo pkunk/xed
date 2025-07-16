@@ -4,6 +4,7 @@ use aho_corasick::AhoCorasick;
 use eframe::egui;
 use eframe::egui::TextBuffer;
 use egui_file::FileDialog;
+use std::any::TypeId;
 use std::cmp::Ordering;
 use std::ffi::{OsStr, OsString};
 use std::fs;
@@ -45,7 +46,7 @@ fn main() {
         "Xenonauts CE save editor",
         options,
         Box::new(|_cc| {
-            Ok(Box::new(MyApp {
+            Ok(Box::new(XedApp {
                 save_name: None,
                 orig_save_data: None,
                 soldiers,
@@ -108,7 +109,7 @@ impl Soldier {
     }
 }
 
-struct MyApp {
+struct XedApp {
     save_name: Option<OsString>,
     orig_save_data: Option<Vec<u8>>,
     soldiers: [Soldier; N],
@@ -116,7 +117,7 @@ struct MyApp {
     open_file_dialog: Option<FileDialog>,
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for XedApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.label("");
@@ -252,6 +253,10 @@ impl TextBuffer for NameString {
 
     fn take(&mut self) -> String {
         std::mem::take(&mut self.text)
+    }
+
+    fn type_id(&self) -> TypeId {
+        TypeId::of::<Self>()
     }
 }
 
