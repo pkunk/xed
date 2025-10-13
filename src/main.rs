@@ -124,7 +124,7 @@ impl eframe::App for XedApp {
             ui.horizontal(|ui| {
                 ui.label("        ");
                 if ui.button("Open").clicked() {
-                    let mut dialog = FileDialog::open_file(None);
+                    let mut dialog = FileDialog::open_file(Some(PathBuf::from(".")));
                     dialog.open();
                     self.open_file_dialog = Some(dialog);
                 }
