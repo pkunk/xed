@@ -128,6 +128,7 @@ impl eframe::App for XedApp {
                     dialog.open();
                     self.open_file_dialog = Some(dialog);
                 }
+                #[allow(clippy::collapsible_if)]
                 if let Some(dialog) = &mut self.open_file_dialog {
                     if dialog.show(ctx).selected() {
                         if let Some(file) = dialog.path() {
@@ -150,6 +151,7 @@ impl eframe::App for XedApp {
                         }
                     }
                 }
+                #[allow(clippy::collapsible_if)]
                 if ui.button("Save").clicked() {
                     if let Some(save_name) = &self.save_name {
                         write_save_file(
